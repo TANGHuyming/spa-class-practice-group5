@@ -25,7 +25,7 @@ export default function Contact({ onUploadSuccess }) {
     setLoading(true);
     setError('');
     try {
-      await api.upload(tel, caption, csrfToken);
+      await api.upload(tel, name, caption, csrfToken);
       setTel('');
       setName('');
       setCaption('');

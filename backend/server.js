@@ -137,7 +137,7 @@ app.get("/api/auth/me", (req, res) => {
 
 // get contact endpoint
 app.get('/api/contacts', authenticateSession, (req, res) => {
-  const {username} = req.session.user;;
+  const {username} = req.session.user;
   const context = users.find(u => u.username === username).contacts;
   return res.status(200).json(context);
 });

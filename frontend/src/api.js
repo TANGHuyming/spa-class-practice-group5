@@ -81,13 +81,14 @@ export const api = {
     return res.json();
   },
 
-  async upload(imageFile, caption, _csrf) {
+  async addContact(tel, name, caption, _csrf) {
     const formData = new FormData();
-    formData.append("image", imageFile);
+    formData.append("tel", tel);
+    formData.append("name", name);
     formData.append("caption", caption);
     formData.append("_csrf", _csrf); // Standard field name for csurf
 
-    const res = await this.fetchWithCreds(`${API_BASE_URL}/upload`, {
+    const res = await this.fetchWithCreds(`${API_BASE_URL}/addContact`, {
       method: "POST",
       headers: { "X-CSRF-Token": _csrf },
       body: formData,
