@@ -44,8 +44,8 @@ app.use(csrfProtection);
 let csrfToken = "";
 const users = [
   {
-    username: "user",
-    password: bcrypt.hashSync("user", 10),
+    username: 'user',
+    password: bcrypt.hashSync('user', 10),
     contacts: [
       {
         id: 1,
@@ -136,35 +136,35 @@ app.get("/api/auth/me", (req, res) => {
 });
 
 // get contact endpoint
-app.get("/api/contacts", authenticateSession, (req, res) => {
-  const username = req.session.username;
-  const context = users.find((u) => u.username === username).contacts;
+app.get('/api/contacts', authenticateSession, (req, res) => {
+  const {username} = req.session.user;;
+  const context = users.find(u => u.username === username).contacts;
   return res.status(200).json(context);
 });
 
 // add contact endpoint
-app.post(
-  "/api/addContact",
-  authenticateSession,
-  authenticateCsrf,
-  (req, res) => {
-    const { name, tel, description } = req.body;
-    const username = req.session.username;
+app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
+  const { name, tel, caption } = req.body;
+  const {username} = req.session.user;
 
-    const newContact = {
-      id: contacts.length + 1,
-      name,
-      tel: String(tel),
-      description,
-      timestamp: new Date(),
-    };
+  const newContact = {
+    id: contacts.length + 1,
+    name,
+    tel: String(tel),
+    description: caption,
+    timestamp: new Date(),
+  };
 
-    const newUser = users.find((u) => u.username === username);
+  const userWithNewContacts = users.find(u => u.username === username);
+  userWithNewContacts.contacts.push(newContact);
 
-    contacts.unshift(newContact);
-    res.status(201).json(newPost);
-  },
-);
+  const id = users.findIndex(u => u.username === username);
+  users.splice(id, 1);
+
+  users.push(userWithNewContacts);
+
+  res.status(201).json(newContact);
+});
 
 // Error handling for CSRF errors
 app.use((err, req, res, next) => {
