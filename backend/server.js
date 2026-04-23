@@ -44,17 +44,44 @@ app.use(csrfProtection);
 let csrfToken = "";
 const users = [
   {
-    username: 'user',
-    password: bcrypt.hashSync('user', 10),
-    contacts: [
-      {
-        id: 1,
-        name: "the person this number belongs to",
-        tel: "phone number of this person",
-        description: "description about the person",
-        timestamp: new Date(),
-      },
-    ],
+    id: 1,
+    name: "Alex Rivera",
+    tel: "+1-555-010-2345",
+    description:
+      "Senior software architect specializing in distributed systems and cloud infrastructure.",
+    timestamp: new Date(),
+  },
+  {
+    id: 2,
+    name: "Samantha Chen",
+    tel: "+1-555-012-3456",
+    description:
+      "Freelance graphic designer and illustrator with a focus on minimalist branding.",
+    timestamp: new Date(),
+  },
+  {
+    id: 3,
+    name: "Jordan Smith",
+    tel: "+1-555-014-5678",
+    description:
+      "Project manager for the regional sustainability initiative and urban planning committee.",
+    timestamp: new Date(),
+  },
+  {
+    id: 4,
+    name: "Dr. Elena Vance",
+    tel: "+1-555-016-7890",
+    description:
+      "Lead researcher in renewable energy technologies and energy storage solutions.",
+    timestamp: new Date(),
+  },
+  {
+    id: 5,
+    name: "Marcus Thorne",
+    tel: "+1-555-018-9012",
+    description:
+      "Customer success lead responsible for high-value enterprise accounts in the APAC region.",
+    timestamp: new Date(),
   },
 ];
 // const contacts = [
@@ -137,7 +164,7 @@ app.get("/api/auth/me", (req, res) => {
 
 // get contact endpoint
 app.get('/api/contacts', authenticateSession, (req, res) => {
-  const {username} = req.session.user;
+  const { username } = req.session.user;
   const context = users.find(u => u.username === username).contacts;
   return res.status(200).json(context);
 });
@@ -145,7 +172,7 @@ app.get('/api/contacts', authenticateSession, (req, res) => {
 // add contact endpoint
 app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
   const { name, tel, caption } = req.body;
-  const {username} = req.session.user;
+  const { username } = req.session.user;
 
   const newContact = {
     id: contacts.length + 1,
