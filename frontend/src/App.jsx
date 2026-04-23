@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Feed from './components/Feed';
 import Upload from './components/Upload';
+import Contact from './components/Contact';
 import Profile from './components/Profile';
 import { api } from './api';
 
@@ -58,6 +59,8 @@ function App() {
         return <Feed key={refreshKey} />;
       case 'upload':
         return <Upload onUploadSuccess={handleUploadSuccess} />;
+      case 'contact':
+        return <Contact onUploadSuccess={handleUploadSuccess} />;
       case 'profile':
         return <Profile />;
       default:
@@ -83,6 +86,12 @@ function App() {
               className={`text-sm font-semibold ${view === 'upload' ? 'text-black' : 'text-gray-400'}`}
             >
               Upload
+            </button>
+            <button
+              onClick={() => setView('contact')}
+              className={`text-sm font-semibold ${view === 'contact' ? 'text-black' : 'text-gray-400'}`}
+            >
+              Contact
             </button>
             <button
               onClick={() => setView('profile')}
