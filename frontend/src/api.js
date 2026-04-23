@@ -90,8 +90,8 @@ export const api = {
 
     const res = await this.fetchWithCreds(`${API_BASE_URL}/addContact`, {
       method: "POST",
-      headers: { "X-CSRF-Token": _csrf },
-      body: formData,
+      headers: { "X-CSRF-Token": _csrf, "Content-Type": "application/json", },
+      body: JSON.stringify({name, tel, caption}),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Upload failed");

@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
+const { randomUUID } = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -178,10 +179,11 @@ app.get('/api/contacts', authenticateSession, (req, res) => {
 // add contact endpoint
 app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
   const { name, tel, caption } = req.body;
+  console.log(req.body)
   const { username } = req.session.user;
 
   const newContact = {
-    id: contacts.length + 1,
+    id: randomUUID(),
     name,
     tel: String(tel),
     description: caption,

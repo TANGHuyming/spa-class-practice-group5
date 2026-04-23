@@ -46,24 +46,22 @@ export default function Contact({ onUploadSuccess }) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Hidden CSRF input within the form */}
         <input type="hidden" name="_csrf" value={csrfToken} />
-        <label for="tel" className="block text-sm font-medium text-black">
+        <label htmlFor="tel" className="block text-sm font-medium text-black">
           Tel:
         </label>
         <input
           type="tel"
           id="tel"
-          name="tel"
           onChange={(e) => setTel(e.target.value)}
           className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent outline-none transition"
           required
         />
-        <label for="name" className="block text-sm font-medium text-black">
+        <label htmlFor="name" className="block text-sm font-medium text-black">
           Username:
         </label>
         <input
           type="text"
           id="name"
-          name="name"
           onChange={(e) => setName(e.target.value)}
           className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent outline-none transition"
           required
