@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Auth from "./components/Auth";
 import Feed from "./components/Feed";
 import Upload from "./components/Upload";
+import Contat from "./components/Contact";
 import { api } from "./api";
 
 function App() {
