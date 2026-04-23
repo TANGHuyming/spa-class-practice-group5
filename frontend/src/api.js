@@ -75,17 +75,9 @@ export const api = {
     return res.json();
   },
 
-  async getFeed() {
-    const res = await this.fetchWithCreds(`${API_BASE_URL}/feed`);
-    if (!res.ok) throw new Error("Failed to fetch feed");
-    return res.json();
-  },
-
-  async getProfile(username) {
-    const res = await this.fetchWithCreds(
-      `${API_BASE_URL}/profile/${username}`,
-    );
-    if (!res.ok) throw new Error("Failed to fetch profile");
+  async getContacts() {
+    const res = await this.fetchWithCreds(`${API_BASE_URL}/contacts`);
+    if (!res.ok) throw new Error("Failed to fetch contacts");
     return res.json();
   },
 

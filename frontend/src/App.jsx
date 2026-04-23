@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import Auth from './components/Auth';
-import Feed from './components/Feed';
-import Upload from './components/Upload';
-import Contact from './components/Contact';
-import Profile from './components/Profile';
-import { api } from './api';
+import { useState, useEffect } from "react";
+import Auth from "./components/Auth";
+import Feed from "./components/Feed";
+import Upload from "./components/Upload";
+import { api } from "./api";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [view, setView] = useState('feed'); // 'feed', 'upload', or 'profile'
+  const [view, setView] = useState("feed"); // 'feed', 'upload', or 'profile'
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -30,19 +28,23 @@ function App() {
     try {
       await api.logout();
       setIsAuthenticated(false);
-      setView('feed');
+      setView("feed");
     } catch (err) {
-      console.error('Logout failed', err);
+      console.error("Logout failed", err);
     }
   };
 
   const handleUploadSuccess = () => {
-    setView('feed');
+    setView("feed");
     setRefreshKey((prev) => prev + 1); // Trigger feed refresh
   };
 
   if (isInitialLoad) {
-    return <div className="min-h-screen flex items-center justify-center">Loading session...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading session...
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
@@ -55,14 +57,10 @@ function App() {
 
   const renderView = () => {
     switch (view) {
-      case 'feed':
+      case "feed":
         return <Feed key={refreshKey} />;
-      case 'upload':
+      case "upload":
         return <Upload onUploadSuccess={handleUploadSuccess} />;
-      case 'contact':
-        return <Contact onUploadSuccess={handleUploadSuccess} />;
-      case 'profile':
-        return <Profile />;
       default:
         return <Feed key={refreshKey} />;
     }
@@ -73,31 +71,24 @@ function App() {
       {/* Navigation */}
       <nav className="bg-white border-b border-gray-300 sticky top-0 z-10 h-16 flex items-center">
         <div className="max-w-4xl mx-auto w-full flex justify-between px-4 items-center">
-          <h1 className="text-xl font-bold italic cursor-pointer" onClick={() => setView('feed')}>Instagram</h1>
+          <h1
+            className="text-xl font-bold italic cursor-pointer"
+            onClick={() => setView("feed")}
+          >
+            PhoneBook
+          </h1>
           <div className="flex gap-4 items-center">
             <button
-              onClick={() => setView('feed')}
-              className={`text-sm font-semibold ${view === 'feed' ? 'text-black' : 'text-gray-400'}`}
+              onClick={() => setView("feed")}
+              className={`text-sm font-semibold ${view === "feed" ? "text-black" : "text-gray-400"}`}
             >
               Home
             </button>
             <button
-              onClick={() => setView('upload')}
-              className={`text-sm font-semibold ${view === 'upload' ? 'text-black' : 'text-gray-400'}`}
+              onClick={() => setView("upload")}
+              className={`text-sm font-semibold ${view === "upload" ? "text-black" : "text-gray-400"}`}
             >
               Upload
-            </button>
-            <button
-              onClick={() => setView('contact')}
-              className={`text-sm font-semibold ${view === 'contact' ? 'text-black' : 'text-gray-400'}`}
-            >
-              Contact
-            </button>
-            <button
-              onClick={() => setView('profile')}
-              className={`text-sm font-semibold ${view === 'profile' ? 'text-black' : 'text-gray-400'}`}
-            >
-              Profile
             </button>
             <button
               onClick={handleLogout}
@@ -110,9 +101,7 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 pt-4">
-        {renderView()}
-      </main>
+      <main className="max-w-4xl mx-auto px-4 pt-4">{renderView()}</main>
     </div>
   );
 }
