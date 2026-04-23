@@ -41,18 +41,27 @@ let csrfToken = '';
 const users = [
   {
     username: 'user',
-    password: bcrypt.hashSync('user', 10)
+    password: bcrypt.hashSync('user', 10),
+    contacts = [
+      {
+        id: 1,
+        name: 'the person this number belongs to',
+        tel: 'phone number of this person',
+        description: 'description about the person',
+        timestamp: new Date()
+      }
+    ]
   }
 ];
-const contacts = [
-  {
-    id: 1,
-    name: 'the person this number belongs to',
-    tel: 'phone number of this person',
-    description: 'description about the person',
-    timestamp: new Date()
-  }
-];
+// const contacts = [
+//   {
+//     id: 1,
+//     name: 'the person this number belongs to',
+//     tel: 'phone number of this person',
+//     description: 'description about the person',
+//     timestamp: new Date()
+//   }
+// ];
 
 // Session Middleware
 const authenticateSession = (req, res, next) => {
@@ -120,9 +129,17 @@ app.get('/api/auth/me', (req, res) => {
   }
 });
 
+// get contact endpoint
+app.get('/api/contacts', authenticateSession, (req, res) => {
+  const username = req.session.username;
+  const context = users.find(u => u.username === username).contacts;
+  return res.status(200).json(context);
+})
+
 // add contact endpoint
 app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
   const { name, tel, description } = req.body;
+  const username = req.session.username;
 
   const newContact = {
     id: contacts.length + 1,
@@ -131,6 +148,8 @@ app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) =>
     description,
     timestamp: new Date(),
   };
+
+  const newUser = users.find(u => u.username === username);
 
   contacts.unshift(newContact);
   res.status(201).json(newPost);
