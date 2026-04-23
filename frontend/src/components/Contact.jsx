@@ -19,16 +19,8 @@ export default function Contact({ onUploadSuccess }) {
     fetchCsrf();
   }, []);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.value);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setError('Please select an image');
-      return;
-    }
 
     setLoading(true);
     setError('');
