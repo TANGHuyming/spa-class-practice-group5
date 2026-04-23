@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Auth from "./components/Auth";
 import Feed from "./components/Feed";
-import Upload from "./components/Upload";
+import Contact from "./components/Contact";
 import { api } from "./api";
 
 function App() {
@@ -60,7 +60,7 @@ function App() {
       case "feed":
         return <Feed key={refreshKey} />;
       case "upload":
-        return <Upload onUploadSuccess={handleUploadSuccess} />;
+        return <Contact onUploadSuccess={handleUploadSuccess} />;
       default:
         return <Feed key={refreshKey} />;
     }
@@ -88,7 +88,7 @@ function App() {
               onClick={() => setView("upload")}
               className={`text-sm font-semibold ${view === "upload" ? "text-black" : "text-gray-400"}`}
             >
-              Upload
+              Contact
             </button>
             <button
               onClick={handleLogout}
