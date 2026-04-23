@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
@@ -41,11 +40,11 @@ app.use(csrfProtection);
 // In-memory storage (Mock seeding)
 const users = [
   {
-    username: 'photolover',
-    password: bcrypt.hashSync('password123', 10)
+    username: 'user',
+    password: bcrypt.hashSync('user', 10)
   }
 ];
-const posts = [
+const contacts = [
   {
     id: 1,
     username: 'photolover',
@@ -55,17 +54,6 @@ const posts = [
   }
 ];
 
-// Multer Setup for Image Uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage });
-
 // Session Middleware
 const authenticateSession = (req, res, next) => {
   if (req.session.user) {
@@ -74,6 +62,17 @@ const authenticateSession = (req, res, next) => {
     res.status(401).json({ message: 'Unauthorized: No session' });
   }
 };
+
+const authenticateCsrf = (req, res, next) => {
+  const userCsrfToken = req.get('x-csrf-token');
+  const csrfToken = req.csrfToken();
+
+  if(!csrfToken || csrfToken !== userCsrfToken) {
+    res.status(401).json({message: 'No CSRF included'});
+  }
+  
+  next();
+}
 
 // CSRF Token Route
 app.get('/api/csrf-token', (req, res) => {
@@ -121,24 +120,8 @@ app.get('/api/auth/me', (req, res) => {
   }
 });
 
-// Feed Route
-app.get('/api/feed', (req, res) => {
-  res.json(posts);
-});
-
-// Profile Route
-app.get('/api/profile/:username', (req, res) => {
-  const { username } = req.params;
-  const userPosts = posts.filter(p => p.username === username);
-  res.json({
-    username,
-    posts: userPosts,
-    postCount: userPosts.length
-  });
-});
-
 // Upload Route
-app.post('/api/upload', authenticateSession, upload.single('image'), (req, res) => {
+app.post('/api/add-contact', authenticateSession, upload.single('image'), (req, res) => {
   const { caption } = req.body;
   if (!req.file) return res.status(400).json({ message: 'No image uploaded' });
 
