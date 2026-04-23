@@ -19,7 +19,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser()); // Required for csurf
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Session Configuration
 app.use(session({
@@ -38,21 +37,31 @@ const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
 
 // In-memory storage (Mock seeding)
+let csrfToken = '';
 const users = [
   {
     username: 'user',
-    password: bcrypt.hashSync('user', 10)
+    password: bcrypt.hashSync('user', 10),
+    contacts = [
+      {
+        id: 1,
+        name: 'the person this number belongs to',
+        tel: 'phone number of this person',
+        description: 'description about the person',
+        timestamp: new Date()
+      }
+    ]
   }
 ];
-const contacts = [
-  {
-    id: 1,
-    username: 'photolover',
-    imageUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
-    caption: 'Welcome to my minimal Instagram clone with CSRF Protection! 📸',
-    timestamp: new Date()
-  }
-];
+// const contacts = [
+//   {
+//     id: 1,
+//     name: 'the person this number belongs to',
+//     tel: 'phone number of this person',
+//     description: 'description about the person',
+//     timestamp: new Date()
+//   }
+// ];
 
 // Session Middleware
 const authenticateSession = (req, res, next) => {
@@ -65,7 +74,6 @@ const authenticateSession = (req, res, next) => {
 
 const authenticateCsrf = (req, res, next) => {
   const userCsrfToken = req.get('x-csrf-token');
-  const csrfToken = req.csrfToken();
 
   if(!csrfToken || csrfToken !== userCsrfToken) {
     res.status(401).json({message: 'No CSRF included'});
@@ -76,7 +84,8 @@ const authenticateCsrf = (req, res, next) => {
 
 // CSRF Token Route
 app.get('/api/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
+  csrfToken = req.csrfToken();
+  res.json({ csrfToken });
 });
 
 // Auth Routes
@@ -120,20 +129,29 @@ app.get('/api/auth/me', (req, res) => {
   }
 });
 
-// Upload Route
-app.post('/api/add-contact', authenticateSession, upload.single('image'), (req, res) => {
-  const { caption } = req.body;
-  if (!req.file) return res.status(400).json({ message: 'No image uploaded' });
+// get contact endpoint
+app.get('/api/contacts', authenticateSession, (req, res) => {
+  const username = req.session.username;
+  const context = users.find(u => u.username === username).contacts;
+  return res.status(200).json(context);
+})
 
-  const newPost = {
-    id: posts.length + 1,
-    username: req.session.user.username,
-    imageUrl: `/uploads/${req.file.filename}`,
-    caption,
+// add contact endpoint
+app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
+  const { name, tel, description } = req.body;
+  const username = req.session.username;
+
+  const newContact = {
+    id: contacts.length + 1,
+    name,
+    tel: String(tel),
+    description,
     timestamp: new Date(),
   };
 
-  posts.unshift(newPost);
+  const newUser = users.find(u => u.username === username);
+
+  contacts.unshift(newContact);
   res.status(201).json(newPost);
 });
 
