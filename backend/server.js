@@ -1,57 +1,61 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const bcrypt = require('bcryptjs');
-const session = require('express-session');
-const csrf = require('csurf');
-const cookieParser = require('cookie-parser');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback_secret';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const SESSION_SECRET = process.env.SESSION_SECRET || "fallback_secret";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 // Middleware
-app.use(cors({ 
-  origin: FRONTEND_URL, 
-  credentials: true 
-}));
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser()); // Required for csurf
 
 // Session Configuration
-app.use(session({
-  secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false, // Set to true if using HTTPS
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    },
+  }),
+);
 
 // CSRF Protection
 const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
 
 // In-memory storage (Mock seeding)
-let csrfToken = '';
+let csrfToken = "";
 const users = [
   {
-    username: 'user',
-    password: bcrypt.hashSync('user', 10),
-    contacts = [
+    username: "user",
+    password: bcrypt.hashSync("user", 10),
+    contacts: [
       {
         id: 1,
-        name: 'the person this number belongs to',
-        tel: 'phone number of this person',
-        description: 'description about the person',
-        timestamp: new Date()
-      }
-    ]
-  }
+        name: "the person this number belongs to",
+        tel: "phone number of this person",
+        description: "description about the person",
+        timestamp: new Date(),
+      },
+    ],
+  },
 ];
 // const contacts = [
 //   {
@@ -68,97 +72,104 @@ const authenticateSession = (req, res, next) => {
   if (req.session.user) {
     next();
   } else {
-    res.status(401).json({ message: 'Unauthorized: No session' });
+    res.status(401).json({ message: "Unauthorized: No session" });
   }
 };
 
 const authenticateCsrf = (req, res, next) => {
-  const userCsrfToken = req.get('x-csrf-token');
+  const userCsrfToken = req.get("x-csrf-token");
 
-  if(!csrfToken || csrfToken !== userCsrfToken) {
-    res.status(401).json({message: 'No CSRF included'});
+  if (!csrfToken || csrfToken !== userCsrfToken) {
+    res.status(401).json({ message: "No CSRF included" });
   }
-  
+
   next();
-}
+};
 
 // CSRF Token Route
-app.get('/api/csrf-token', (req, res) => {
+app.get("/api/csrf-token", (req, res) => {
   csrfToken = req.csrfToken();
   res.json({ csrfToken });
 });
 
 // Auth Routes
-app.post('/api/auth/signup', async (req, res) => {
+app.post("/api/auth/signup", async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ message: 'Username and password required' });
+  if (!username || !password)
+    return res.status(400).json({ message: "Username and password required" });
 
-  const existingUser = users.find(u => u.username === username);
-  if (existingUser) return res.status(400).json({ message: 'User already exists' });
+  const existingUser = users.find((u) => u.username === username);
+  if (existingUser)
+    return res.status(400).json({ message: "User already exists" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
   users.push({ username, password: hashedPassword });
-  res.status(201).json({ message: 'User created' });
+  res.status(201).json({ message: "User created" });
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
+  const user = users.find((u) => u.username === username);
 
   if (user && (await bcrypt.compare(password, user.password))) {
     req.session.user = { username };
-    res.json({ message: 'Login successful', username });
+    res.json({ message: "Login successful", username });
   } else {
-    res.status(401).json({ message: 'Invalid credentials' });
+    res.status(401).json({ message: "Invalid credentials" });
   }
 });
 
-app.post('/api/auth/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).json({ message: 'Logout failed' });
-    res.clearCookie('connect.sid');
-    res.json({ message: 'Logout successful' });
+app.post("/api/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ message: "Logout failed" });
+    res.clearCookie("connect.sid");
+    res.json({ message: "Logout successful" });
   });
 });
 
-app.get('/api/auth/me', (req, res) => {
+app.get("/api/auth/me", (req, res) => {
   if (req.session.user) {
     res.json(req.session.user);
   } else {
-    res.status(401).json({ message: 'No active session' });
+    res.status(401).json({ message: "No active session" });
   }
 });
 
 // get contact endpoint
-app.get('/api/contacts', authenticateSession, (req, res) => {
+app.get("/api/contacts", authenticateSession, (req, res) => {
   const username = req.session.username;
-  const context = users.find(u => u.username === username).contacts;
+  const context = users.find((u) => u.username === username).contacts;
   return res.status(200).json(context);
-})
+});
 
 // add contact endpoint
-app.post('/api/addContact', authenticateSession, authenticateCsrf, (req, res) => {
-  const { name, tel, description } = req.body;
-  const username = req.session.username;
+app.post(
+  "/api/addContact",
+  authenticateSession,
+  authenticateCsrf,
+  (req, res) => {
+    const { name, tel, description } = req.body;
+    const username = req.session.username;
 
-  const newContact = {
-    id: contacts.length + 1,
-    name,
-    tel: String(tel),
-    description,
-    timestamp: new Date(),
-  };
+    const newContact = {
+      id: contacts.length + 1,
+      name,
+      tel: String(tel),
+      description,
+      timestamp: new Date(),
+    };
 
-  const newUser = users.find(u => u.username === username);
+    const newUser = users.find((u) => u.username === username);
 
-  contacts.unshift(newContact);
-  res.status(201).json(newPost);
-});
+    contacts.unshift(newContact);
+    res.status(201).json(newPost);
+  },
+);
 
 // Error handling for CSRF errors
 app.use((err, req, res, next) => {
-  if (err.code !== 'EBADCSRFTOKEN') return next(err);
-  res.status(403).json({ message: 'Invalid CSRF token' });
+  if (err.code !== "EBADCSRFTOKEN") return next(err);
+  res.status(403).json({ message: "Invalid CSRF token" });
 });
 
 app.listen(PORT, () => {
