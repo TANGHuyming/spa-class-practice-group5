@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api';
+import { useState, useEffect } from "react";
+import { api } from "../api";
 
 export default function Upload({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
-  const [caption, setCaption] = useState('');
-  const [csrfToken, setCsrfToken] = useState('');
+  const [caption, setCaption] = useState("");
+  const [csrfToken, setCsrfToken] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Fetch CSRF token for the form on mount
   useEffect(() => {
@@ -24,16 +24,16 @@ export default function Upload({ onUploadSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError('Please select an image');
+      setError("Please select an image");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
     try {
       await api.upload(file, caption, csrfToken);
       setFile(null);
-      setCaption('');
+      setCaption("");
       onUploadSuccess();
     } catch (err) {
       setError(err.message);
@@ -70,10 +70,12 @@ export default function Upload({ onUploadSuccess }) {
           disabled={loading}
           className="bg-blue-500 text-white py-2 rounded font-semibold text-sm hover:bg-blue-600 disabled:opacity-50"
         >
-          {loading ? 'Uploading...' : 'Share'}
+          {loading ? "Uploading..." : "Share"}
         </button>
       </form>
-      {error && <p className="text-red-500 text-xs mt-4 text-center">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-xs mt-4 text-center">{error}</p>
+      )}
     </div>
   );
 }
