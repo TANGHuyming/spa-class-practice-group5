@@ -44,44 +44,50 @@ app.use(csrfProtection);
 let csrfToken = "";
 const users = [
   {
-    id: 1,
-    name: "Alex Rivera",
-    tel: "+1-555-010-2345",
-    description:
-      "Senior software architect specializing in distributed systems and cloud infrastructure.",
-    timestamp: new Date(),
-  },
-  {
-    id: 2,
-    name: "Samantha Chen",
-    tel: "+1-555-012-3456",
-    description:
-      "Freelance graphic designer and illustrator with a focus on minimalist branding.",
-    timestamp: new Date(),
-  },
-  {
-    id: 3,
-    name: "Jordan Smith",
-    tel: "+1-555-014-5678",
-    description:
-      "Project manager for the regional sustainability initiative and urban planning committee.",
-    timestamp: new Date(),
-  },
-  {
-    id: 4,
-    name: "Dr. Elena Vance",
-    tel: "+1-555-016-7890",
-    description:
-      "Lead researcher in renewable energy technologies and energy storage solutions.",
-    timestamp: new Date(),
-  },
-  {
-    id: 5,
-    name: "Marcus Thorne",
-    tel: "+1-555-018-9012",
-    description:
-      "Customer success lead responsible for high-value enterprise accounts in the APAC region.",
-    timestamp: new Date(),
+    username: 'user',
+    password: bcrypt.hashSync('user', 10),
+    contacts: [
+      {
+        id: 1,
+        name: "Alex Rivera",
+        tel: "+1-555-010-2345",
+        description:
+          "Senior software architect specializing in distributed systems and cloud infrastructure.",
+        timestamp: new Date(),
+      },
+      {
+        id: 2,
+        name: "Samantha Chen",
+        tel: "+1-555-012-3456",
+        description:
+          "Freelance graphic designer and illustrator with a focus on minimalist branding.",
+        timestamp: new Date(),
+      },
+      {
+        id: 3,
+        name: "Jordan Smith",
+        tel: "+1-555-014-5678",
+        description:
+          "Project manager for the regional sustainability initiative and urban planning committee.",
+        timestamp: new Date(),
+      },
+      {
+        id: 4,
+        name: "Dr. Elena Vance",
+        tel: "+1-555-016-7890",
+        description:
+          "Lead researcher in renewable energy technologies and energy storage solutions.",
+        timestamp: new Date(),
+      },
+      {
+        id: 5,
+        name: "Marcus Thorne",
+        tel: "+1-555-018-9012",
+        description:
+          "Customer success lead responsible for high-value enterprise accounts in the APAC region.",
+        timestamp: new Date(),
+      },
+    ]
   },
 ];
 // const contacts = [
